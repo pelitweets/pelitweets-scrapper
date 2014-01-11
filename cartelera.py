@@ -130,6 +130,13 @@ for row in rows:
             pos2 = movie_link.rfind(".html")
             movie_id = movie_link[pos1:pos2]
 
+            # Buscamos esta peli en la base de datos, y si ya esta, pasamos al siguiente registro
+            query = {'movie_id': movie_id}
+            doc = pelitweets_db.find_one(query)
+            if doc:
+                print "Movie already present: %s. Skipping" % movie_id
+                continue
+
             info_html = scraperwiki.scrape(movie_link)
             root = lxml.html.fromstring(info_html)
 
@@ -177,6 +184,7 @@ for row in rows:
 
             # Creamos el JSON para enchufar en Mongo
             json_movie_data = {
+                'movie_id': movie_id,
                 'movie_title': title,
                 'movie_original_title': movie_original_title,
                 'movie_runtime': movie_runtime,
