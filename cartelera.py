@@ -9,14 +9,24 @@ import scraperwiki
 import lxml.html
 import re
 from datetime import *
+import sys
+import pymongo
+from pymongo import MongoClient
 import json
 import urllib
+from os import environ
 
+# URLs para llamar para hacer scrapping
 BASE_URL = "http://www.filmaffinity.com"
 date = datetime(MAXYEAR, 1, 1).date()
 movie_counter = 0
 
 IMDB_API_URL = 'http://www.omdbapi.com/?'
+
+# Parametros de conexion con mongodb
+connection = MongoClient(environ['MONGO_URL'], int(environ['MONGO_PORT']))
+db = connection[environ['MONGO_DBNAME']]
+db.authenticate(environ['MONGO_DBUSER'], environ['MONGO_DBPASSWORD'])
 
 # Paso 1: Obtener pelis en cartelera (filmaffinity)
 html = scraperwiki.scrape("http://www.filmaffinity.com/es/rdcat.php?id=new_th_es")
