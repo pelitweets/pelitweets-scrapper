@@ -129,7 +129,7 @@ for row in rows:
             scraperwiki.sqlite.save(['movie_id'], data = data)
 
             info_html = scraperwiki.scrape(movie_link)
-            info_root = lxml.info_html.fromstring(info_html)
+            root = lxml.html.fromstring(info_html)
 
             # Get movie items for movie info page
 
@@ -145,6 +145,7 @@ for row in rows:
             rating_div = root.cssselect("div[id='movie-rat-avg']")
             if rating_div:
                 movie_fa_rating = rating_div[0].text_content().strip()
+                movie_fa_rating = re.sub(r",", ".", movie_fa_rating)
 
             for movie_item in movie_items:
 
