@@ -1,0 +1,4 @@
+scraperwiki
+lxml
+cssselect
+pymongo
