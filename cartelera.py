@@ -23,10 +23,12 @@ movie_counter = 0
 
 IMDB_API_URL = 'http://www.omdbapi.com/?'
 
+MONGODB_URI = 'mongodb://%s:%s@%s:%d/%s' % (environ['MONGO_DBUSER'], environ['MONGO_DBPASSWORD'], environ['MONGO_URL'], int(environ['MONGO_PORT']), environ['MONGO_DBNAME'])
+
 # Parametros de conexion con mongodb
-connection = MongoClient(environ['MONGO_URL'], int(environ['MONGO_PORT']))
-db = connection[environ['MONGO_DBNAME']]
-db.authenticate(environ['MONGO_DBUSER'], environ['MONGO_DBPASSWORD'])
+client = pymongo.MongoClient(MONGODB_URI)
+db = client.get_default_database()
+pelitweets_db = db['pelitweets']
 
 # Paso 1: Obtener pelis en cartelera (filmaffinity)
 html = scraperwiki.scrape("http://www.filmaffinity.com/es/rdcat.php?id=new_th_es")
@@ -172,6 +174,24 @@ for row in rows:
 
             if data_imdb['Response'].title() == 'True':
                 movie_imdb_rating = data_imdb['imdbRating']
+
+            # Creamos el JSON para enchufar en Mongo
+            json_movie_data = {
+                'movie_title': title,
+                'movie_original_title': movie_original_title,
+                'movie_runtime': movie_runtime,
+                'movie_plot': movie_plot,
+                'movie_year': year,
+                'movie_release_date': date.strftime("%Y-%m-%d"),
+                'movie_country': movie_country,
+                'movie_rating_fa': movie_fa_rating,
+                'movie_rating_imdb': movie_imdb_rating,
+                'movie_official_web': movie_official_web,
+                'movie_poster_link': movie_poster_link
+            }
+
+            # Metemos en la base de datos el objeto json
+            pelitweets_db.insert(json_movie_data)
 
             print "************************"
             print "Movie title: %s" % title
