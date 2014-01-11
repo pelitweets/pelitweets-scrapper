@@ -118,16 +118,6 @@ for row in rows:
             pos2 = movie_link.rfind(".html")
             movie_id = movie_link[pos1:pos2]
 
-            data = {
-                'movie_id': movie_id,
-                'movie_title' : title,
-                'movie_year' : year,
-                'movie_release_date' : date,
-                'movie_info_page': movie_link
-            }
-            # Save entry
-            scraperwiki.sqlite.save(['movie_id'], data = data)
-
             info_html = scraperwiki.scrape(movie_link)
             root = lxml.html.fromstring(info_html)
 
