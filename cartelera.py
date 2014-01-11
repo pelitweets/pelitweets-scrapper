@@ -9,14 +9,26 @@ import scraperwiki
 import lxml.html
 import re
 from datetime import *
+import sys
+import pymongo
+from pymongo import MongoClient
 import json
 import urllib
+from os import environ
 
+# URLs para llamar para hacer scrapping
 BASE_URL = "http://www.filmaffinity.com"
 date = datetime(MAXYEAR, 1, 1).date()
 movie_counter = 0
 
 IMDB_API_URL = 'http://www.omdbapi.com/?'
+
+MONGODB_URI = 'mongodb://%s:%s@%s:%d/%s' % (environ['MONGO_DBUSER'], environ['MONGO_DBPASSWORD'], environ['MONGO_URL'], int(environ['MONGO_PORT']), environ['MONGO_DBNAME'])
+
+# Parametros de conexion con mongodb
+client = pymongo.MongoClient(MONGODB_URI)
+db = client.get_default_database()
+pelitweets_db = db['pelitweets']
 
 # Paso 1: Obtener pelis en cartelera (filmaffinity)
 html = scraperwiki.scrape("http://www.filmaffinity.com/es/rdcat.php?id=new_th_es")
@@ -118,18 +130,15 @@ for row in rows:
             pos2 = movie_link.rfind(".html")
             movie_id = movie_link[pos1:pos2]
 
-            data = {
-                'movie_id': movie_id,
-                'movie_title' : title,
-                'movie_year' : year,
-                'movie_release_date' : date,
-                'movie_info_page': movie_link
-            }
-            # Save entry
-            scraperwiki.sqlite.save(['movie_id'], data = data)
+            # Buscamos esta peli en la base de datos, y si ya esta, pasamos al siguiente registro
+            query = {'movie_id': movie_id}
+            doc = pelitweets_db.find_one(query)
+            if doc:
+                print "Movie already present: %s. Skipping" % movie_id
+                continue
 
             info_html = scraperwiki.scrape(movie_link)
-            info_root = lxml.info_html.fromstring(info_html)
+            root = lxml.html.fromstring(info_html)
 
             # Get movie items for movie info page
 
@@ -145,6 +154,7 @@ for row in rows:
             rating_div = root.cssselect("div[id='movie-rat-avg']")
             if rating_div:
                 movie_fa_rating = rating_div[0].text_content().strip()
+                movie_fa_rating = re.sub(r",", ".", movie_fa_rating)
 
             for movie_item in movie_items:
 
@@ -171,6 +181,25 @@ for row in rows:
 
             if data_imdb['Response'].title() == 'True':
                 movie_imdb_rating = data_imdb['imdbRating']
+
+            # Creamos el JSON para enchufar en Mongo
+            json_movie_data = {
+                'movie_id': movie_id,
+                'movie_title': title,
+                'movie_original_title': movie_original_title,
+                'movie_runtime': movie_runtime,
+                'movie_plot': movie_plot,
+                'movie_year': year,
+                'movie_release_date': date.strftime("%Y-%m-%d"),
+                'movie_country': movie_country,
+                'movie_rating_fa': movie_fa_rating,
+                'movie_rating_imdb': movie_imdb_rating,
+                'movie_official_web': movie_official_web,
+                'movie_poster_link': movie_poster_link
+            }
+
+            # Metemos en la base de datos el objeto json
+            pelitweets_db.insert(json_movie_data)
 
             print "************************"
             print "Movie title: %s" % title
