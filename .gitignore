@@ -45,3 +45,6 @@ pip-log.txt
 
 #Tests
 hsph_faculty_1
+
+# pyCharm
+.idea
