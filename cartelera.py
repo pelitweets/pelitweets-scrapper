@@ -28,7 +28,7 @@ MONGODB_URI = 'mongodb://%s:%s@%s:%d/%s' % (environ['MONGO_DBUSER'], environ['MO
 # Parametros de conexion con mongodb
 client = pymongo.MongoClient(MONGODB_URI)
 db = client.get_default_database()
-pelitweets_db = db['pelitweets']
+pelitweets_db = db['movies']
 
 # Paso 1: Obtener pelis en cartelera (filmaffinity)
 html = scraperwiki.scrape("http://www.filmaffinity.com/es/rdcat.php?id=new_th_es")
