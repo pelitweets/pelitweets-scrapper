@@ -23,12 +23,27 @@ movie_counter = 0
 
 IMDB_API_URL = 'http://www.omdbapi.com/?'
 
-MONGODB_URI = 'mongodb://%s:%s@%s:%d/%s' % (environ['MONGO_DBUSER'], environ['MONGO_DBPASSWORD'], environ['MONGO_URL'], int(environ['MONGO_PORT']), environ['MONGO_DBNAME'])
+MONGODB_URI = 'mongodb://%s:%s@%s:%d/%s' % (
+environ['MONGO_DBUSER'], environ['MONGO_DBPASSWORD'], environ['MONGO_URL'], int(environ['MONGO_PORT']),
+environ['MONGO_DBNAME'])
 
 # Parametros de conexion con mongodb
 client = pymongo.MongoClient(MONGODB_URI)
 db = client.get_default_database()
 pelitweets_db = db['movies']
+
+# Iniciamos variables
+movie_id = ''
+title = ''
+movie_original_title = ''
+movie_runtime = ''
+movie_plot = ''
+year = ''
+movie_country = ''
+movie_fa_rating = ''
+movie_imdb_rating = ''
+movie_official_web = ''
+movie_poster_link = ''
 
 # Paso 1: Obtener pelis en cartelera (filmaffinity)
 html = scraperwiki.scrape("http://www.filmaffinity.com/es/rdcat.php?id=new_th_es")
@@ -110,7 +125,7 @@ for row in rows:
                 year = 9999
             else:
                 try:
-                    year = int(title_and_year[first_par+1:last_par])
+                    year = int(title_and_year[first_par + 1:last_par])
                 except ValueError, e:
                     year = 9999
 
@@ -175,7 +190,7 @@ for row in rows:
 
 
             # The imdb rating
-            query_parameters = {'t' : movie_original_title.encode('utf-8')}
+            query_parameters = {'t': movie_original_title.encode('utf-8')}
             response = urllib.urlopen(IMDB_API_URL + urllib.urlencode(query_parameters))
             data_imdb = json.load(response)
 
@@ -220,7 +235,6 @@ for row in rows:
 
         else:
             continue
-
 
 print "%d movies" % movie_counter
 
