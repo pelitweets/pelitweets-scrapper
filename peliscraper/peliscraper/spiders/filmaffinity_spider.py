@@ -26,8 +26,12 @@ class FilmaffinitySpider(scrapy.Spider):
             if not date:
                 continue
 
+            # Build item object
             item = PeliscraperItem()
 
             item['movie_release_date'] = date
+
+            # Now, the rest of the fields
+
 
             yield item
