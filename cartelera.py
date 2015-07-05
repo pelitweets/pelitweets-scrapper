@@ -2,7 +2,7 @@
 # Jorge Arevalo - jorgeas80@gmail.com
 
 '''
-Scrapping the filmaffinity para obtener peliculas en cartelera y almacenarlas en MongoDB
+Scrapping filmaffinity para obtener peliculas en cartelera y almacenarlas en MongoDB
 '''
 
 import scraperwiki
