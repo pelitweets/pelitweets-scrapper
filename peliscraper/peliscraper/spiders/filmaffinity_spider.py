@@ -1,7 +1,11 @@
 # -*- coding= utf-8 -*-
 import scrapy
+import urllib
+import json
 
 from peliscraper.items import PeliscraperItem
+
+IMDB_API_URL = 'http://www.omdbapi.com/?'
 
 
 class FilmaffinitySpider(scrapy.Spider):
@@ -71,7 +75,7 @@ class FilmaffinitySpider(scrapy.Spider):
         else:
             movie_official_web = u''
 
-        movie_original_title, movie_year, movie_runtime, movie_country, movie_plot = u'', u'', u'', u'', u''
+        movie_original_title, movie_year, movie_runtime, movie_country, movie_plot, movie_imdb_rating = u'', u'', u'', u'', u'', u''
 
         # Rest of fields
         dt_nodes = response.xpath('//div[@id="left-column"]/dl[@class="movie-info"]/dt')
@@ -88,6 +92,15 @@ class FilmaffinitySpider(scrapy.Spider):
             elif dt_node.xpath('text()')[0].extract().strip() == u'Sinopsis':
                 movie_plot = dt_node.xpath('following-sibling::dd/text()')[0].extract().strip()
 
+        # The imdb rating
+        if movie_original_title:
+            query_parameters = {'t': movie_original_title.encode('utf-8')}
+            r = urllib.urlopen(IMDB_API_URL + urllib.urlencode(query_parameters))
+            data_imdb = json.load(r)
+
+            if data_imdb['Response'].title() == 'True':
+                movie_imdb_rating = data_imdb['imdbRating']
+
 
 
         # Now, build the item
@@ -102,7 +115,7 @@ class FilmaffinitySpider(scrapy.Spider):
         item['movie_country'] = unicode(movie_country)
         item['movie_plot'] = unicode(movie_plot)
         item['movie_rating_fa'] = unicode(movie_rating_fa)
-        item['movie_rating_imdb'] = u''
+        item['movie_rating_imdb'] = unicode(movie_imdb_rating)
         item['movie_poster_link'] = movie_poster_link
         item['movie_official_web'] = unicode(movie_official_web)
 
