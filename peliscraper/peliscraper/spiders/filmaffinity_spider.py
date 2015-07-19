@@ -2,6 +2,7 @@
 import scrapy
 import urllib
 import json
+from datetime import datetime
 
 from peliscraper.items import PeliscraperItem
 
@@ -101,7 +102,12 @@ class FilmaffinitySpider(scrapy.Spider):
             if data_imdb['Response'].title() == 'True':
                 movie_imdb_rating = data_imdb['imdbRating']
 
-
+        # Transform the date
+        try:
+            us_date = datetime.strptime(movie_release_date, "%d/%m/%Y").date()
+            movie_release_date = us_date.strftime("%Y-%m-%d")
+        except ValueError:
+            yield None
 
         # Now, build the item
         item = PeliscraperItem()
