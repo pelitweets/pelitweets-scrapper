@@ -34,21 +34,21 @@ class FilmaffinitySpider(scrapy.Spider):
         if not movie_id_array or not isinstance(movie_id_array, list) or len(movie_id_array) <= 0:
             yield None
 
-        movie_id = movie_id_array[0]
+        movie_id = movie_id_array[0].strip()
 
         # Movie release date
         movie_release_date_array = response.xpath('//div[@id="movie-categories"]/text()').re('\((.+?)\)')
         if not movie_release_date_array or not isinstance(movie_release_date_array, list) or len(movie_release_date_array) <= 0:
             yield None
 
-        movie_release_date = movie_release_date_array[0]
+        movie_release_date = movie_release_date_array[0].strip()
 
         # Movie rating filmaffinity
         movie_rating_array = response.xpath('//div[@id="movie-rat-avg"]/text()').extract()
         if not movie_rating_array or not isinstance(movie_rating_array, list) or len(movie_rating_array) <= 0:
             yield None
 
-        movie_rating_fa = movie_rating_array[0]
+        movie_rating_fa = movie_rating_array[0].strip()
 
         # Movie title
         movie_title_array = response.xpath('//h1[@id="main-title"]').xpath('span[@itemprop="name"]/text()').extract()
@@ -62,7 +62,7 @@ class FilmaffinitySpider(scrapy.Spider):
         if not movie_poster_link_array or not isinstance(movie_poster_link_array, list) or len(movie_poster_link_array) <= 0:
             yield None
 
-        movie_poster_link = movie_poster_link_array[0]
+        movie_poster_link = movie_poster_link_array[0].strip()
 
 
         # Rest of fields
