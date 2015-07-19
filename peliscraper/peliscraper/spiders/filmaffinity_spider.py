@@ -64,6 +64,14 @@ class FilmaffinitySpider(scrapy.Spider):
 
         movie_poster_link = movie_poster_link_array[0].strip()
 
+        # Movie web
+        movie_official_web_array = response.xpath('//dd[@class="web-url"]/a/@href').extract()
+        if movie_official_web_array and isinstance(movie_official_web_array, list) and len(movie_official_web_array) > 0:
+            movie_official_web  = movie_official_web_array[0]
+        else:
+            movie_official_web = u''
+
+        movie_original_title, movie_year, movie_runtime, movie_country, movie_plot = u'', u'', u'', u'', u''
 
         # Rest of fields
         dt_nodes = response.xpath('//div[@id="left-column"]/dl[@class="movie-info"]/dt')
@@ -96,7 +104,7 @@ class FilmaffinitySpider(scrapy.Spider):
         item['movie_rating_fa'] = unicode(movie_rating_fa)
         item['movie_rating_imdb'] = u''
         item['movie_poster_link'] = movie_poster_link
-        item['movie_official_web'] = u''
+        item['movie_official_web'] = unicode(movie_official_web)
 
 
         yield item
