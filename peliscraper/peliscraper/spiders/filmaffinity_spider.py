@@ -1,6 +1,5 @@
 # -*- coding= utf-8 -*-
 import scrapy
-import re
 
 from peliscraper.items import PeliscraperItem
 
@@ -31,14 +30,11 @@ class FilmaffinitySpider(scrapy.Spider):
     def parse_dir_contents(self, response):
 
         # Movie id
-        # TODO: Extract id from here. Use regular expresion
-        movie_id_array = response.xpath('//head/meta[@property="og:url"]/@content').extract()
+        movie_id_array = response.xpath('//head/meta[@property="og:url"]/@content').re('http://www.filmaffinity.com/es/film(.+?).html')
         if not movie_id_array or not isinstance(movie_id_array, list) or len(movie_id_array) <= 0:
             yield None
 
-        found = re.search('http://www.filmaffinity.com/es/film(.+?).html', str(movie_id_array[0]))
-        if found:
-            movie_id = found.group(1)
+        movie_id = movie_id_array[0]
 
         # Movie release date
         movie_release_date_array = response.xpath('//div[@id="movie-categories"]/text()').re('\((.+?)\)')
