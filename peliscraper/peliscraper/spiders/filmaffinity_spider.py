@@ -41,8 +41,11 @@ class FilmaffinitySpider(scrapy.Spider):
             movie_id = found.group(1)
 
         # Movie release date
-        # TODO: This is hard
-        move_release_date_array = response.xpath('//div[@id="movie-categories"]').xpath('a/@href/following-sibling')
+        movie_release_date_array = response.xpath('//div[@id="movie-categories"]/text()').re('\((.+?)\)')
+        if not movie_release_date_array or not isinstance(movie_release_date_array, list) or len(movie_release_date_array) <= 0:
+            yield None
+
+        movie_release_date = movie_release_date_array[0]
 
         # Movie title
         movie_title_array = response.xpath('//h1[@id="main-title"]').xpath('span[@itemprop="name"]/text()').extract()
@@ -71,6 +74,7 @@ class FilmaffinitySpider(scrapy.Spider):
         item = PeliscraperItem()
 
         item['movie_id'] = movie_id
+        item['movie_release_date'] = movie_release_date
         item['movie_title'] = unicode(movie_title)
         item['movie_original_title'] = unicode(movie_original_title)
         item['movie_year'] = unicode(movie_year)
