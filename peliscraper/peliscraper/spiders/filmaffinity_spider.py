@@ -1,5 +1,6 @@
 # -*- coding= utf-8 -*-
 import scrapy
+import re
 
 from peliscraper.items import PeliscraperItem
 
@@ -31,9 +32,13 @@ class FilmaffinitySpider(scrapy.Spider):
 
         # Movie id
         # TODO: Extract id from here. Use regular expresion
-        movie_id_array = response.xpath('//head/meta[@property="og:url"]').extract()
+        movie_id_array = response.xpath('//head/meta[@property="og:url"]/@content').extract()
         if not movie_id_array or not isinstance(movie_id_array, list) or len(movie_id_array) <= 0:
             yield None
+
+        found = re.search('http://www.filmaffinity.com/es/film(.+?).html', str(movie_id_array[0]))
+        if found:
+            movie_id = found.group(1)
 
         # Movie release date
         # TODO: This is hard
@@ -65,6 +70,7 @@ class FilmaffinitySpider(scrapy.Spider):
         # Now, build the item
         item = PeliscraperItem()
 
+        item['movie_id'] = movie_id
         item['movie_title'] = unicode(movie_title)
         item['movie_original_title'] = unicode(movie_original_title)
         item['movie_year'] = unicode(movie_year)
