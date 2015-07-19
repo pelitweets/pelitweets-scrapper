@@ -43,11 +43,27 @@ class FilmaffinitySpider(scrapy.Spider):
 
         movie_release_date = movie_release_date_array[0]
 
+        # Movie rating filmaffinity
+        movie_rating_array = response.xpath('//div[@id="movie-rat-avg"]/text()').extract()
+        if not movie_rating_array or not isinstance(movie_rating_array, list) or len(movie_rating_array) <= 0:
+            yield None
+
+        movie_rating_fa = movie_rating_array[0]
+
         # Movie title
         movie_title_array = response.xpath('//h1[@id="main-title"]').xpath('span[@itemprop="name"]/text()').extract()
         if not movie_title_array or not isinstance(movie_title_array, list) or len(movie_title_array) <= 0:
             yield None
+
         movie_title = movie_title_array[0].strip()
+
+        # Movie image link
+        movie_poster_link_array = response.xpath('//div[@id="movie-main-image-container"]/a/img/@src').extract()
+        if not movie_poster_link_array or not isinstance(movie_poster_link_array, list) or len(movie_poster_link_array) <= 0:
+            yield None
+
+        movie_poster_link = movie_poster_link_array[0]
+
 
         # Rest of fields
         dt_nodes = response.xpath('//div[@id="left-column"]/dl[@class="movie-info"]/dt')
@@ -77,6 +93,10 @@ class FilmaffinitySpider(scrapy.Spider):
         item['movie_runtime'] = unicode(movie_runtime)
         item['movie_country'] = unicode(movie_country)
         item['movie_plot'] = unicode(movie_plot)
+        item['movie_rating_fa'] = unicode(movie_rating_fa)
+        item['movie_rating_imdb'] = u''
+        item['movie_poster_link'] = movie_poster_link
+        item['movie_official_web'] = u''
 
 
         yield item
