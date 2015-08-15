@@ -49,12 +49,14 @@ class FilmaffinitySpider(scrapy.Spider):
         movie_release_date = movie_release_date_array[0].strip()
 
         # Movie rating filmaffinity
+        # TODO: Shouldn't we make all the comparisons this way?
         movie_rating_array = response.xpath('//div[@id="movie-rat-avg"]/text()').extract()
-        if not movie_rating_array or not isinstance(movie_rating_array, list) or len(movie_rating_array) <= 0:
+        if movie_rating_array and isinstance(movie_rating_array, list) and len(movie_rating_array) > 0:
+            movie_rating_fa = movie_rating_array[0].strip()
+        else:
+            movie_rating_fa = ''
             yield None
-
-        movie_rating_fa = movie_rating_array[0].strip()
-
+        
         # Movie title
         movie_title_array = response.xpath('//h1[@id="main-title"]').xpath('span[@itemprop="name"]/text()').extract()
         if not movie_title_array or not isinstance(movie_title_array, list) or len(movie_title_array) <= 0:
