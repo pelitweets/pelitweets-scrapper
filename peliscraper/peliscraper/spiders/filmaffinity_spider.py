@@ -2,8 +2,8 @@
 import scrapy
 import urllib
 import json
+import requests 
 from datetime import datetime
-
 from peliscraper.items import PeliscraperItem
 
 IMDB_API_URL = 'http://www.omdbapi.com/?'
@@ -30,6 +30,9 @@ class FilmaffinitySpider(scrapy.Spider):
 
                 yield scrapy.Request(url, callback=self.parse_dir_contents)
 
+        # Run Texalytics after parsing
+        r = requests.get('http://pelitweets.herokuapp.com/api/analyze')
+        #TODO: Check if r.status_code = 200
 
 
     def parse_dir_contents(self, response):
