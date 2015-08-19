@@ -9,10 +9,6 @@ from pymongo import MongoClient
 from os import environ
 from scrapy.exceptions import DropItem
 
-MONGODB_URI = 'mongodb://%s:%s@%s:%d/%s' % (
-environ['MONGO_DBUSER'], environ['MONGO_DBPASSWORD'], environ['MONGO_URL'], int(environ['MONGO_PORT']),
-environ['MONGO_DBNAME'])
-
 class PeliscraperPipeline(object):
     def process_item(self, item, spider):
         return item
@@ -45,7 +41,7 @@ class MongoPipeline(object):
 
         doc = self.db[self.collection_name].find_one(query)
         if doc:
-            raise DropItem("Duplicate item found: %s" % item)
+            raise DropItem("Duplicated item found: %s" % item)
         else:
             self.db[self.collection_name].insert(dict(item))
             return item
