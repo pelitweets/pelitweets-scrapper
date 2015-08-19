@@ -28,8 +28,8 @@ class MongoPipeline(object):
     @classmethod
     def from_crawler(cls, crawler):
         return cls(
-            mongo_uri=MONGODB_URI,
-            mongo_db=environ['MONGO_DBNAME']
+            mongo_uri=crawler.spider.mongodb_uri,
+            mongo_db=crawler.spider.mongodb_name
         )
 
     def open_spider(self, spider):
@@ -42,6 +42,7 @@ class MongoPipeline(object):
     def process_item(self, item, spider):
         # Does the item already exist?
         query = {'movie_id': item['movie_id']}
+
         doc = self.db[self.collection_name].find_one(query)
         if doc:
             raise DropItem("Duplicate item found: %s" % item)

@@ -14,6 +14,10 @@ class FilmaffinitySpider(scrapy.Spider):
     allowed_domains = ["filmaffinity.com"]
     start_urls = ["http://www.filmaffinity.com/es/rdcat.php?id=new_th_es"]
 
+    def __init__(self, mongodb_uri='', mongodb_name=''):
+        self.mongodb_uri = mongodb_uri
+        self.mongodb_name = mongodb_name
+
     def parse(self, response):
         for node in response.xpath('//div[@id="main-wrapper-rdcat"]'):
 
