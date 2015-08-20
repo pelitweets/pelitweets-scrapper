@@ -4,6 +4,7 @@ import urllib
 import json
 import requests 
 from datetime import datetime
+import time
 from peliscraper.items import PeliscraperItem
 
 IMDB_API_URL = 'http://www.omdbapi.com/?'
@@ -53,13 +54,16 @@ class FilmaffinitySpider(scrapy.Spider):
         if not movie_release_date_array or not isinstance(movie_release_date_array, list) or len(movie_release_date_array) <= 0:
             yield None
 
-        movie_release_date = movie_release_date_array[0].strip()
+        # Need to change the fucking date format
+        movie_release_date_str = movie_release_date_array[0].strip()
+        movie_release_date_t = time.strptime(movie_release_date_str, "%d/%m/%y")
+        movie_release_date = time.strftime("%Y-%m-%d", movie_release_date_t)
 
         # Movie rating filmaffinity
         # TODO: Shouldn't we make all the comparisons this way?
         movie_rating_array = response.xpath('//div[@id="movie-rat-avg"]/text()').extract()
         if movie_rating_array and isinstance(movie_rating_array, list) and len(movie_rating_array) > 0:
-            movie_rating_fa = movie_rating_array[0].strip()
+            movie_rating_fa = movie_rating_array[0].strip().replace(",", ".")
         else:
             movie_rating_fa = ''
             yield None
