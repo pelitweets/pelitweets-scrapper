@@ -43,9 +43,9 @@ NEWSPIDER_MODULE = 'peliscraper.spiders'
 
 # Enable or disable spider middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
-#SPIDER_MIDDLEWARES = {
-#    'peliscraper.middlewares.MyCustomSpiderMiddleware': 543,
-#}
+SPIDER_MIDDLEWARES = {
+    'peliscraper.middlewares.PelitweetsMiddleware': 543,
+}
 
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html

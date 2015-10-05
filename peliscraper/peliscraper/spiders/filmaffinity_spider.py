@@ -30,8 +30,6 @@ class FilmaffinitySpider(scrapy.Spider):
 
                 yield scrapy.Request(url, callback=self.parse_dir_contents)
 
-
-
     def parse_dir_contents(self, response):
 
         # Movie id
